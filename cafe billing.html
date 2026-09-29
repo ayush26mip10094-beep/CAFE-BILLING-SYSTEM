@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mayuri Lounge - Cafe Billing System</title>
+
+    <style>
+
+        /* ------------------------------
+           BASIC PAGE DESIGN
+        ------------------------------ */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f9;
+            min-height: 100vh;
+        }
+
+        /* ------------------------------
+           HEADER
+        ------------------------------ */
+
+        .header {
+            background-color: #3d2c2e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        /* ------------------------------
+           MAIN CONTAINER
+        ------------------------------ */
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 25px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .box h2 {
+            color: #3d2c2e;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* ------------------------------
+           MENU TABLE
+        ------------------------------ */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #3d2c2e;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        td:first-child {
+            text-align: left;
+        }
+
+        .quantity {
+            width: 60px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+        }
+
+        /* ------------------------------
+           DISCOUNT
+        ------------------------------ */
+
+        .discount-section {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .discount-section input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+        }
+
+        /* ------------------------------
+           BUTTONS
+        ------------------------------ */
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            padding: 11px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .reset-btn {
+            background-color: #d9534f;
+        }
+
+        .reset-btn:hover {
+            background-color: #c9302c;
+        }
+
+        .pay-btn {
+            background-color: #5cb85c;
+        }
+
+        .pay-btn:hover {
+            background-color: #449d44;
+        }
+
+        .print-btn {
+            background-color: #337ab7;
+        }
+
+        .print-btn:hover {
+            background-color: #286090;
+        }
+
+        /* ------------------------------
+           RECEIPT
+        ------------------------------ */
+
+        .receipt {
+            background-color: #fafafa;
+            border: 1px solid #ccc;
+            padding: 20px;
+            min-height: 430px;
+            font-family: "Courier New", monospace;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .receipt-header h3 {
+            font-size: 20px;
+        }
+
+        .line {
+            border-top: 1px dashed #555;
+            margin: 10px 0;
+        }
+
+        .receipt-table {
+            width: 100%;
+            font-family: "Courier New", monospace;
+        }
+
+        .receipt-table td {
+            border: none;
+            padding: 4px;
+            font-family: "Courier New", monospace;
+        }
+
+        .receipt-table td:first-child {
+            text-align: left;
+        }
+
+        .receipt-table td:not(:first-child) {
+            text-align: right;
+        }
+
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .thank-you {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        /* ------------------------------
+           MOBILE RESPONSIVE DESIGN
+        ------------------------------ */
+
+        @media (max-width: 800px) {
+
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            table {
+                font-size: 13px;
+            }
+        }
+
+        /* ------------------------------
+           PRINT DESIGN
+        ------------------------------ */
+
+        @media print {
+
+            body * {
+                visibility: hidden;
+            }
+
+            .receipt,
+            .receipt * {
+                visibility: visible;
+            }
+
+            .receipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <div class="header">
+
+        <h1>☕ MAYURI LOUNGE</h1>
+
+        <p>Cafe & Restaurant | Billing System</p>
+
+    </div>
+
+
+    <!-- =====================================
+         MAIN CONTENT
+    ====================================== -->
+
+    <div class="container">
+
+
+        <!-- =================================
+             MENU SECTION
+        ================================== -->
+
+        <div class="box">
+
+            <h2>Menu Items</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Price (₹)</th>
+                        <th>Quantity</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr>
+                        <td>Espresso</td>
+                        <td>₹120</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Espresso"
+                                data-price="120"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Cappuccino</td>
+                        <td>₹160</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Cappuccino"
+                                data-price="160"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Iced Latte</td>
+                        <td>₹180</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Iced Latte"
+                                data-price="180"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Cold Brew</td>
+                        <td>₹200</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Cold Brew"
+                                data-price="200"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Croissant</td>
+                        <td>₹150</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Croissant"
+                                data-price="150"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Chocolate Muffin</td>
+                        <td>₹130</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Chocolate Muffin"
+                                data-price="130"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Club Sandwich</td>
+                        <td>₹220</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Club Sandwich"
+                                data-price="220"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Cheesecake</td>
+                        <td>₹250</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Cheesecake"
+                                data-price="250"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Hot Tea</td>
+                        <td>₹60</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Hot Tea"
+                                data-price="60"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Brownie with Icecream</td>
+                        <td>₹180</td>
+                        <td>
+                            <input
+                                type="number"
+                                class="quantity"
+                                data-name="Brownie with Icecream"
+                                data-price="180"
+                                min="0"
+                                value="0"
+                                onchange="updateBill()">
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+
+            <!-- DISCOUNT -->
+
+            <div class="discount-section">
+
+                <label>
+                    <strong>Discount (%):</strong>
+                </label>
+
+                <input
+                    type="number"
+                    id="discount"
+                    value="0"
+                    min="0"
+                    max="100"
+                    onchange="updateBill()">
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="buttons">
+
+                <button
+                    class="reset-btn"
+                    onclick="resetBill()">
+                    Reset
+                </button>
+
+
+                <button
+                    class="pay-btn"
+                    onclick="processBill()">
+                    Process Bill
+                </button>
+
+
+                <button
+                    class="print-btn"
+                    onclick="window.print()">
+                    Print
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             RECEIPT SECTION
+        ================================== -->
+
+        <div class="box">
+
+            <h2>Live Receipt</h2>
+
+            <div
+                class="receipt"
+                id="receipt">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         JAVASCRIPT
+    ====================================== -->
+
+    <script>
+
+        // GST rate
+        const GST_RATE = 0.05;
+
+
+        // -----------------------------------
+        // UPDATE BILL
+        // -----------------------------------
+
+        function updateBill() {
+
+            let subtotal = 0;
+
+            let selectedItems = [];
+
+
+            // Get all quantity inputs
+            const quantities =
+                document.querySelectorAll(".quantity");
+
+
+            // Check every menu item
+            quantities.forEach(function(input) {
+
+                let quantity =
+                    parseInt(input.value) || 0;
+
+                let itemName =
+                    input.dataset.name;
+
+                let price =
+                    parseFloat(input.dataset.price);
+
+
+                if (quantity > 0) {
+
+                    let itemTotal =
+                        price * quantity;
+
+                    subtotal += itemTotal;
+
+
+                    selectedItems.push({
+
+                        name: itemName,
+
+                        quantity: quantity,
+
+                        price: price,
+
+                        total: itemTotal
+
+                    });
+
+                }
+
+            });
+
+
+            // Get discount
+            let discount =
+                parseFloat(
+                    document.getElementById("discount").value
+                ) || 0;
+
+
+            // Keep discount between 0 and 100
+            if (discount < 0) {
+                discount = 0;
+            }
+
+            if (discount > 100) {
+                discount = 100;
+            }
+
+
+            // Calculate discount amount
+            let discountAmount =
+                subtotal * discount / 100;
+
+
+            // Amount after discount
+            let taxableAmount =
+                subtotal - discountAmount;
+
+
+            // GST
+            let gst =
+                taxableAmount * GST_RATE;
+
+
+            // Final amount
+            let grandTotal =
+                taxableAmount + gst;
+
+
+            // Create receipt
+            createReceipt(
+                selectedItems,
+                subtotal,
+                discount,
+                discountAmount,
+                gst,
+                grandTotal
+            );
+        }
+
+
+        // -----------------------------------
+        // CREATE RECEIPT
+        // -----------------------------------
+
+        function createReceipt(
+            items,
+            subtotal,
+            discount,
+            discountAmount,
+            gst,
+            grandTotal
+        ) {
+
+            let receiptHTML = "";
+
+
+            // Current date and time
+            let now = new Date();
+
+            let date =
+                now.toLocaleDateString("en-IN");
+
+            let time =
+                now.toLocaleTimeString("en-IN");
+
+
+            receiptHTML += `
+
+                <div class="receipt-header">
+
+                    <h3>MAYURI LOUNGE</h3>
+
+                    <p>Cafe & Restaurant</p>
+
+                    <p>Special Block, VIT Bhopal</p>
+
+                    <p>${date} | ${time}</p>
+
+                </div>
+
+                <div class="line"></div>
+
+            `;
+
+
+            // Receipt table
+            receiptHTML += `
+
+                <table class="receipt-table">
+
+                    <tr>
+                        <td><strong>Item</strong></td>
+                        <td><strong>Qty</strong></td>
+                        <td><strong>Total</strong></td>
+                    </tr>
+
+            `;
+
+
+            // Display selected items
+            if (items.length === 0) {
+
+                receiptHTML += `
+
+                    <tr>
+
+                        <td
+                            colspan="3"
+                            style="text-align:center; padding:25px;">
+
+                            [ No Items Selected ]
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+            else {
+
+                items.forEach(function(item) {
+
+                    receiptHTML += `
+
+                        <tr>
+
+                            <td>
+                                ${item.name}
+                            </td>
+
+                            <td>
+                                ${item.quantity}
+                            </td>
+
+                            <td>
+                                ₹${item.total.toFixed(2)}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+            }
+
+
+            receiptHTML += `</table>`;
+
+
+            receiptHTML += `
+
+                <div class="line"></div>
+
+                <table class="receipt-table">
+
+                    <tr>
+
+                        <td>Subtotal:</td>
+
+                        <td colspan="2">
+                            ₹${subtotal.toFixed(2)}
+                        </td>
+
+                    </tr>
+
+            `;
+
+
+            // Display discount
+            if (discountAmount > 0) {
+
+                receiptHTML += `
+
+                    <tr>
+
+                        <td>
+                            Discount (${discount}%):
+                        </td>
+
+                        <td colspan="2">
+                            -₹${discountAmount.toFixed(2)}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+
+            // GST
+            receiptHTML += `
+
+                    <tr>
+
+                        <td>GST (5%):</td>
+
+                        <td colspan="2">
+                            ₹${gst.toFixed(2)}
+                        </td>
+
+                    </tr>
+
+                </table>
+
+                <div class="line"></div>
+
+                <table class="receipt-table">
+
+                    <tr class="total">
+
+                        <td>
+                            GRAND TOTAL:
+                        </td>
+
+                        <td colspan="2">
+                            ₹${grandTotal.toFixed(2)}
+                        </td>
+
+                    </tr>
+
+                </table>
+
+                <div class="line"></div>
+
+                <div class="thank-you">
+
+                    Thank you for visiting! ☕
+
+                    <br><br>
+
+                    Please visit again.
+
+                </div>
+
+            `;
+
+
+            // Show receipt
+            document.getElementById("receipt").innerHTML =
+                receiptHTML;
+        }
+
+
+        // -----------------------------------
+        // RESET BILL
+        // -----------------------------------
+
+        function resetBill() {
+
+            // Reset all quantities
+            document
+                .querySelectorAll(".quantity")
+                .forEach(function(input) {
+
+                    input.value = 0;
+
+                });
+
+
+            // Reset discount
+            document.getElementById("discount").value = 0;
+
+
+            // Update receipt
+            updateBill();
+
+        }
+
+
+        // -----------------------------------
+        // PROCESS BILL
+        // -----------------------------------
+
+        function processBill() {
+
+            let quantities =
+                document.querySelectorAll(".quantity");
+
+            let hasItems = false;
+
+
+            quantities.forEach(function(input) {
+
+                if (parseInt(input.value) > 0) {
+
+                    hasItems = true;
+
+                }
+
+            });
+
+
+            // No items selected
+            if (!hasItems) {
+
+                alert(
+                    "Please select at least one item before processing the bill."
+                );
+
+                return;
+            }
+
+
+            // Calculate final amount
+            let subtotal = 0;
+
+
+            quantities.forEach(function(input) {
+
+                let quantity =
+                    parseInt(input.value) || 0;
+
+                let price =
+                    parseFloat(input.dataset.price);
+
+                subtotal += quantity * price;
+
+            });
+
+
+            let discount =
+                parseFloat(
+                    document.getElementById("discount").value
+                ) || 0;
+
+
+            let discountAmount =
+                subtotal * discount / 100;
+
+
+            let taxableAmount =
+                subtotal - discountAmount;
+
+
+            let gst =
+                taxableAmount * GST_RATE;
+
+
+            let grandTotal =
+                taxableAmount + gst;
+
+
+            // Confirmation message
+            alert(
+
+                "Bill Generated Successfully!\n\n" +
+
+                "Amount Payable: ₹" +
+                grandTotal.toFixed(2) +
+
+                "\n\nThank you for visiting Mayuri Lounge!"
+
+            );
+
+        }
+
+
+        // -----------------------------------
+        // LOAD INITIAL BILL
+        // -----------------------------------
+
+        updateBill();
+
+    </script>
+
+</body>
+
+</html>
